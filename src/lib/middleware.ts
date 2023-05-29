@@ -66,7 +66,7 @@ export function rsc(options: {
       }
     }
     if (rscId || rsfId) {
-      const pipeable = renderRSC({ rscId, props, rsfId, args });
+      const pipeable = renderRSC({ rscId, headers: req.headers, props, rsfId, args });
       pipeable.on("error", (err) => {
         console.info("Cannot render RSC", err);
         res.statusCode = 500;

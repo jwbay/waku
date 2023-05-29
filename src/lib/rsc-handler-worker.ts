@@ -11,6 +11,7 @@ import { configFileConfig, resolveConfig } from "./config.js";
 import { transformRsfId, generatePrefetchCode } from "./rsc-utils.js";
 import type { RenderInput, MessageReq, MessageRes } from "./rsc-handler.js";
 import { defineEntries } from "../server.js";
+import { getCurrentRequestHeaders, withHeadersStore } from './headers-storage.js'
 import type { unstable_GetCustomModules } from "../server.js";
 import { rscTransformPlugin, rscReloadPlugin } from "./vite-plugin-rsc.js";
 
@@ -226,10 +227,15 @@ async function renderRSC(input: RenderInput): Promise<PipeableStream> {
     const [fileId, name] = input.rsfId.split("#");
     const fname = path.join(config.root, fileId!);
     const mod = await loadServerFile(fname);
-    const data = await (mod[name!] || mod)(...input.args);
-    if (!input.rscId) {
-      return renderToPipeableStream(data, bundlerConfig);
-    }
+    const args = input.args;
+    withHeadersStore(input.headers!, async () => {
+      const headers = getCurrentRequestHeaders();
+      console.log('user-agent in worker src: ', headers['user-agent']);
+      const data = await (mod[name!] || mod)(...args);
+      if (!input.rscId) {
+        return renderToPipeableStream(data, bundlerConfig);
+      }
+    });
     // continue for mutation mode
   }
   if (input.rscId && input.props) {
