@@ -11,7 +11,6 @@ import { configFileConfig, resolveConfig } from "./config.js";
 import { transformRsfId, generatePrefetchCode } from "./rsc-utils.js";
 import type { RenderInput, MessageReq, MessageRes } from "./rsc-handler.js";
 import { defineEntries } from "../server.js";
-import { getCurrentRequestHeaders, withHeadersStore } from './headers-storage.js'
 import type { unstable_GetCustomModules } from "../server.js";
 import { rscTransformPlugin, rscReloadPlugin } from "./vite-plugin-rsc.js";
 
@@ -228,6 +227,7 @@ async function renderRSC(input: RenderInput): Promise<PipeableStream> {
     const fname = path.join(config.root, fileId!);
     const mod = await loadServerFile(fname);
     const args = input.args;
+    const { withHeadersStore, getCurrentRequestHeaders } = await loadServerFile('waku/server');
     withHeadersStore(input.headers!, async () => {
       const headers = getCurrentRequestHeaders();
       console.log('user-agent in worker src: ', headers['user-agent']);

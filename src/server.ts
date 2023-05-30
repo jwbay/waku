@@ -26,4 +26,4 @@ export function defineEntries(getEntry: GetEntry, getBuilder?: GetBuilder) {
   return { getEntry, getBuilder };
 }
 
-export { getCurrentRequestHeaders } from './lib/headers-storage.js'
+export { getCurrentRequestHeaders, withHeadersStore  } from './lib/headers-storage.js'
